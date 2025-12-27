@@ -1,9 +1,22 @@
 import express from "express";
-import { createResource } from "./resource.controller.js";
+import { createResource,submitResource,publishResource  } from "./resource.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { rbacMiddleware } from "../../middlewares/rbac.middleware.js";
+import { listPublicResources } from "./resource.controller.js";
+import { createSlot } from "./resource.controller.js";
+
 
 const router = express.Router();
+
+router.get("/", listPublicResources);
+
+router.post(
+  "/:id/slots",
+  authMiddleware,
+  rbacMiddleware("MUNICIPAL_ADMIN"),
+  createSlot
+);
+
 
 router.post(
   "/",
@@ -11,5 +24,21 @@ router.post(
   rbacMiddleware("MUNICIPAL_ADMIN"),
   createResource
 );
+
+router.post(
+  "/:id/submit",
+  authMiddleware,
+  rbacMiddleware("MUNICIPAL_ADMIN"),
+  submitResource
+);
+
+router.post(
+  "/:id/publish",
+  authMiddleware,
+  rbacMiddleware("CENTRAL_ADMIN"),
+  publishResource
+);
+
+
 
 export default router;

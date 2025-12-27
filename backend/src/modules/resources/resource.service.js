@@ -65,5 +65,188 @@ export const resourceService = {
       status: resource.status,
       municipalityId: resource.municipalityId
     };
+  },
+  async submitResource(user, resourceId) {
+  // 1. Municipality enforcement
+  if (!user.municipalityId) {
+    throw new HttpError(403, "Municipal admin must belong to a municipality");
   }
+
+  // 2. Fetch resource
+  const resource = await resourceRepository.findById(resourceId);
+
+  if (!resource) {
+    throw new HttpError(404, "Resource not found");
+  }
+
+  // 3. Ownership check
+  if (resource.municipalityId !== user.municipalityId) {
+    throw new HttpError(403, "You do not own this resource");
+  }
+
+  // 4. State check
+  if (resource.status !== "DRAFT") {
+    throw new HttpError(
+      400,
+      "Only DRAFT resources can be submitted for approval"
+    );
+  }
+
+  // 5. Update status
+  const updated = await resourceRepository.updateStatus(
+    resourceId,
+    "PENDING_APPROVAL"
+  );
+
+  // 6. Audit log
+  await auditService.log({
+    actorId: user.id,
+    action: "SUBMIT_RESOURCE",
+    entityType: "RESOURCE",
+    entityId: resourceId,
+    beforeData: { status: "DRAFT" },
+    afterData: { status: "PENDING_APPROVAL" }
+  });
+
+  return {
+    id: updated.id,
+    status: updated.status
+  };
+},
+async publishResource(user, resourceId) {
+  // 1. Fetch resource
+  const resource = await resourceRepository.findById(resourceId);
+
+  if (!resource) {
+    throw new HttpError(404, "Resource not found");
+  }
+
+  // 2. State check
+  if (resource.status !== "PENDING_APPROVAL") {
+    throw new HttpError(
+      400,
+      "Only PENDING_APPROVAL resources can be published"
+    );
+  }
+
+  // 3. Publish
+  const updated = await resourceRepository.updateStatus(
+    resourceId,
+    "PUBLISHED"
+  );
+
+  // 4. Audit log
+  await auditService.log({
+    actorId: user.id,
+    action: "PUBLISH_RESOURCE",
+    entityType: "RESOURCE",
+    entityId: resourceId,
+    beforeData: { status: "PENDING_APPROVAL" },
+    afterData: { status: "PUBLISHED" }
+  });
+
+  return {
+    id: updated.id,
+    status: updated.status
+  };
+},
+async listPublicResources(filters) {
+  const {
+    provinceId,
+    districtId,
+    municipalityId,
+    category,
+    resourceType
+  } = filters;
+
+  return resourceRepository.findPublic({
+    provinceId: provinceId ? Number(provinceId) : undefined,
+    districtId: districtId ? Number(districtId) : undefined,
+    municipalityId: municipalityId ? Number(municipalityId) : undefined,
+    category,
+    resourceType
+  });
+},
+async createSlot(user, resourceId, startTime, endTime) {
+  if (!startTime || !endTime) {
+    throw new HttpError(400, "startTime and endTime are required");
+  }
+
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+
+  if (isNaN(start) || isNaN(end) || start >= end) {
+    throw new HttpError(400, "Invalid slot time range");
+  }
+
+  // 1. Fetch resource
+  const resource = await resourceRepository.findById(resourceId);
+
+  if (!resource) {
+    throw new HttpError(404, "Resource not found");
+  }
+
+  // 2. Ownership check
+  if (resource.municipalityId !== user.municipalityId) {
+    throw new HttpError(403, "You do not own this resource");
+  }
+
+  // 3. State + mode check
+  if (resource.status !== "PUBLISHED") {
+    throw new HttpError(400, "Slots can only be added to PUBLISHED resources");
+  }
+
+  if (resource.bookingMode !== "SLOT") {
+    throw new HttpError(
+      400,
+      "Slots can only be added to SLOT-based resources"
+    );
+  }
+
+  // 4. Overlap check (CRITICAL)
+  const conflict = await resourceRepository.hasSlotOverlap({
+    resourceId,
+    startTime: start,
+    endTime: end
+  });
+
+  if (conflict) {
+    throw new HttpError(
+      409,
+      "Slot overlaps with an existing slot"
+    );
+  }
+
+  // 5. Create slot
+  const slot = await resourceRepository.createSlot({
+    resourceId,
+    startTime: start,
+    endTime: end
+  });
+
+  // 6. Audit log
+  await auditService.log({
+    actorId: user.id,
+    action: "CREATE_SLOT",
+    entityType: "RESOURCE_SLOT",
+    entityId: slot.id,
+    afterData: {
+      resourceId,
+      startTime,
+      endTime
+    }
+  });
+
+  return {
+    id: slot.id,
+    startTime: slot.startTime,
+    endTime: slot.endTime
+  };
+}
+
+
+
+
 };
+
+

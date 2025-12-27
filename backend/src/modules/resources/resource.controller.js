@@ -12,3 +12,65 @@ export async function createResource(req, res, next) {
     next(error);
   }
 }
+
+export async function submitResource(req, res, next) {
+  try {
+    const resourceId = Number(req.params.id);
+
+    const resource = await resourceService.submitResource(
+      req.user,
+      resourceId
+    );
+
+    res.json(resource);
+  } catch (error) {
+    next(error);
+  }
+}
+
+
+export async function publishResource(req, res, next) {
+  try {
+    const resourceId = Number(req.params.id);
+
+    const resource = await resourceService.publishResource(
+      req.user,
+      resourceId
+    );
+
+    res.json(resource);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export async function listPublicResources(req, res, next) {
+  try {
+    const resources = await resourceService.listPublicResources(
+      req.query
+    );
+    res.json(resources);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export async function createSlot(req, res, next) {
+  try {
+    const resourceId = Number(req.params.id);
+    const { startTime, endTime } = req.body;
+
+    const slot = await resourceService.createSlot(
+      req.user,
+      resourceId,
+      startTime,
+      endTime
+    );
+
+    res.status(201).json(slot);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
