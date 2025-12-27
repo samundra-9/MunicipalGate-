@@ -1,0 +1,218 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+
+  users User[]
+}
+model User {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  passwordHash      String
+  status            UserStatus @default(ACTIVE)
+
+  roleId            Int
+  role              Role      @relation(fields: [roleId], references: [id])
+
+  municipalityId    Int?
+  municipality      Municipality? @relation(fields: [municipalityId], references: [id])
+
+  createdAt         DateTime  @default(now())
+
+  // --- RELATIONS ---
+  bookings          Booking[]       @relation("UserBookings")
+  decidedBookings   Booking[]       @relation("AdminDecisions")
+
+  adminRequests     AdminRequest[]  @relation("AdminRequestUser")
+  reviewedRequests  AdminRequest[]  @relation("AdminRequestReviewer")
+
+  uploadedMedia     ResourceMedia[] @relation("UserUploadedMedia")
+
+  createdResources  Resource[]
+  auditLogs         AuditLog[]       @relation("ActorLogs")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+model Province {
+  id        Int        @id @default(autoincrement())
+  name      String
+
+  districts District[]
+}
+model District {
+  id          Int        @id @default(autoincrement())
+  name        String
+
+  provinceId Int
+  province   Province   @relation(fields: [provinceId], references: [id])
+
+  municipalities Municipality[]
+}
+model Municipality {
+  id          Int        @id @default(autoincrement())
+  name        String
+
+  districtId  Int
+  district    District  @relation(fields: [districtId], references: [id])
+
+  users       User[]
+  resources   Resource[]
+
+  adminRequests AdminRequest[] @relation("MunicipalityAdminRequests")
+}
+
+model Resource {
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  category      String
+  resourceType  String
+
+  status        ResourceStatus  @default(DRAFT)
+  bookingMode   BookingMode     @default(NONE)
+  capacity      Int?
+
+  municipalityId Int
+  municipality   Municipality   @relation(fields: [municipalityId], references: [id])
+
+  createdById   Int
+  createdBy     User            @relation(fields: [createdById], references: [id])
+
+  media         ResourceMedia[]
+  availability  ResourceAvailability[]
+  rules         ResourceRule[]
+  bookings      Booking[]
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+enum ResourceStatus {
+  DRAFT
+  PENDING_APPROVAL
+  PUBLISHED
+  UNAVAILABLE
+  ARCHIVED
+}
+
+enum BookingMode {
+  NONE
+  REQUEST
+  SLOT
+}
+model ResourceMedia {
+  id            Int      @id @default(autoincrement())
+  resourceId    Int
+  resource      Resource @relation(fields: [resourceId], references: [id])
+
+  type          MediaType
+  url           String
+
+  uploadedById  Int
+  uploadedBy    User     @relation("UserUploadedMedia", fields: [uploadedById], references: [id])
+
+  createdAt     DateTime @default(now())
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+model ResourceAvailability {
+  id          Int      @id @default(autoincrement())
+  resourceId Int
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  dayOfWeek   Int      // 0 = Sunday
+  openTime    String
+  closeTime   String
+  isActive    Boolean  @default(true)
+}
+model ResourceRule {
+  id          Int      @id @default(autoincrement())
+  resourceId Int
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  description String
+}
+model Booking {
+  id            Int           @id @default(autoincrement())
+
+  resourceId    Int
+  resource      Resource      @relation(fields: [resourceId], references: [id])
+
+  userId        Int
+  user          User          @relation("UserBookings", fields: [userId], references: [id])
+
+  startTime     DateTime
+  endTime       DateTime
+
+  status        BookingStatus @default(PENDING)
+
+  decidedById   Int?
+  decidedBy     User?         @relation("AdminDecisions", fields: [decidedById], references: [id])
+
+  requestedAt   DateTime      @default(now())
+  decidedAt     DateTime?
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+
+  actorId    Int
+  actor      User     @relation("ActorLogs", fields: [actorId], references: [id])
+
+  action     String
+  entityType String
+  entityId   Int
+
+  beforeData Json?
+  afterData  Json?
+
+  createdAt  DateTime @default(now())
+}
+model AdminRequest {
+  id             Int      @id @default(autoincrement())
+
+  userId         Int
+  user           User     @relation("AdminRequestUser", fields: [userId], references: [id])
+
+  municipalityId Int
+  municipality   Municipality @relation("MunicipalityAdminRequests", fields: [municipalityId], references: [id])
+
+  status         AdminRequestStatus @default(PENDING)
+
+  reviewedById   Int?
+  reviewedBy     User?    @relation("AdminRequestReviewer", fields: [reviewedById], references: [id])
+
+  createdAt      DateTime @default(now())
+}
+
+enum AdminRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
