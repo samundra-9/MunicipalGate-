@@ -9,6 +9,14 @@ const router = express.Router();
 import { approveBooking } from "./booking.controller.js";
 import { rejectBooking } from "./booking.controller.js";
 
+router.get(
+  "/my",
+  authMiddleware,
+  rbacMiddleware("USER"),
+  getMyBookings
+);
+
+
 router.post(
   "/",
   authMiddleware,

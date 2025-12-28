@@ -60,4 +60,12 @@ export async function createSlotBooking(req, res, next) {
 }
 
 
+export async function getMyBookings(req, res, next) {
+  try {
+    const bookings = await bookingService.getMyBookings(req.user);
+    res.json(bookings);
+  } catch (err) {
+    next(err);
+  }
+}
 

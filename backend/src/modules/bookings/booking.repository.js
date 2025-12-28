@@ -77,9 +77,21 @@ async findPendingSlotBooking({ slotId, userId }) {
       endTime: slot.endTime
     }
   });
+},
+async findByUser(userId) {
+  return prisma.booking.findMany({
+    where: { userId },
+    include: {
+      resource: {
+        select: {
+          title: true
+        }
+      }
+    },
+    orderBy: {
+      requestedAt: "desc"
+    }
+  });
 }
-
-
-
 };
 

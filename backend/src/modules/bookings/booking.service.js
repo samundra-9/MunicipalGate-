@@ -193,7 +193,11 @@ async createSlotBooking(user, slotId) {
     status: booking.status,
     slotId
   };
+},
+async getMyBookings(user) {
+  return bookingRepository.findByUser(user.id);
 }
+
 
 
 };
