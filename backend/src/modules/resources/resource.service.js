@@ -167,6 +167,18 @@ async listPublicResources(filters) {
     resourceType
   });
 },
+async listMyResources(user) {
+  // 1. Municipality enforcement
+  if (!user.municipalityId) {
+    throw new HttpError(403, "Municipal admin must belong to a municipality");
+  }
+
+  // 2. Fetch resources created by this user (all statuses)
+  return resourceRepository.findByCreator({
+    createdById: user.id,
+    municipalityId: user.municipalityId
+  });
+},
 async createSlot(user, resourceId, startTime, endTime) {
   if (!startTime || !endTime) {
     throw new HttpError(400, "startTime and endTime are required");
@@ -242,10 +254,10 @@ async createSlot(user, resourceId, startTime, endTime) {
     startTime: slot.startTime,
     endTime: slot.endTime
   };
+},
+async getSlots(resourceId) {
+  return resourceRepository.findActiveSlots(resourceId);
 }
-
-
-
 
 };
 

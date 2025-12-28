@@ -1,5 +1,5 @@
 import express from "express";
-import { createBooking } from "./booking.controller.js";
+import { createBooking, getMyBookings } from "./booking.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { rbacMiddleware } from "../../middlewares/rbac.middleware.js";
 import { createSlotBooking } from "./booking.controller.js";

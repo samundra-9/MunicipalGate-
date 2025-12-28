@@ -74,3 +74,22 @@ export async function createSlot(req, res, next) {
 };
 
 
+export async function getResourceSlots(req, res, next) {
+  try {
+    const slots = await resourceService.getSlots(
+      Number(req.params.id)
+    );
+    res.json(slots);
+  } catch (e) {
+    next(e);
+  }
+};
+export async function listMyResources(req, res, next) {
+  try {
+    const resources = await resourceService.listMyResources(req.user);
+    res.json(resources);
+  } catch (error) {
+    next(error);
+  }
+};
+

@@ -82,7 +82,17 @@ export const resourceRepository = {
     })
   );
 },
-
+async findByCreator({ createdById, municipalityId }) {
+  return prisma.resource.findMany({
+    where: {
+      createdById,
+      municipalityId
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+},
 async createSlot(data) {
   return prisma.resourceAvailability.create({
     data: {
@@ -90,8 +100,14 @@ async createSlot(data) {
       isActive: true
     }
   });
-}
-
-  
-  
+},
+async findActiveSlots(resourceId) {
+  return prisma.resourceAvailability.findMany({
+    where: {
+      resourceId,
+      isActive: true
+    },
+    orderBy: { startTime: "asc" }
+  });
+}  
 };
