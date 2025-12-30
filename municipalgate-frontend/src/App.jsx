@@ -10,6 +10,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import ResourceDetail from "./pages/ResourceDetail";
 import ResourceForm from "./pages/municipal/ResourceForm";
 import MyResources from "./pages/municipal/MyResources";
+import EditResourceWrapper from "./pages/municipal/EditResource";
 
 export default function App() {
   return (
@@ -62,6 +63,14 @@ export default function App() {
             element={
               <ProtectedRoute role="CENTRAL_ADMIN">
                 <PendingResources />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/municipal/resources/:id/edit"
+            element={
+              <ProtectedRoute role="MUNICIPAL_ADMIN">
+                <EditResourceWrapper />
               </ProtectedRoute>
             }
           />

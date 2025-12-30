@@ -8,22 +8,19 @@ export default function MyResources() {
 
   useEffect(() => {
     fetch("http://localhost:5000/api/resources/my", {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.json())
-      .then((data)=>{
+      .then((res) => res.json())
+      .then((data) => {
         console.log(data);
-        setResources(data)});
+        setResources(data);
+      });
   }, [token]);
 
   async function handleSubmit(id) {
     await submitResource(token, id);
-    setResources(r =>
-      r.map(x =>
-        x.id === id
-          ? { ...x, status: "PENDING_APPROVAL" }
-          : x
-      )
+    setResources((r) =>
+      r.map((x) => (x.id === id ? { ...x, status: "PENDING_APPROVAL" } : x))
     );
   }
 
@@ -41,15 +38,18 @@ export default function MyResources() {
         </thead>
 
         <tbody>
-          {resources.map(r => (
+          {resources.map((r) => (
             <tr key={r.id}>
               <td>{r.title}</td>
               <td>{r.status}</td>
               <td>
                 {r.status === "DRAFT" && (
-                  <button onClick={() => handleSubmit(r.id)}>
-                    Submit for Approval
-                  </button>
+                  <div>
+                    <button onClick={() => handleSubmit(r.id)}>
+                      Submit for Approval
+                    </button>
+                    <Link to={`/municipal/resources/${r.id}/edit`}>Edit</Link>
+                  </div>
                 )}
               </td>
             </tr>

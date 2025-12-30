@@ -51,6 +51,22 @@ export async function submitResource(token, resourceId) {
   if (!res.ok) throw new Error(data.message);
   return data;
 }
+export async function updateResource(token, resourceId, payload) {
+  const res = await fetch(
+    `http://localhost:5000/api/resources/${resourceId}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    }
+  );
 
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data;
+}
 
 

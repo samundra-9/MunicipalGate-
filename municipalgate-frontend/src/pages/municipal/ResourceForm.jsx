@@ -1,52 +1,46 @@
 import { useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
-import { createResource } from "../../api/resources";
+import { createResource,updateResource } from "../../api/resources";
 
-export default function ResourceForm() {
+export default function ResourceForm({ existing }) {
   const { token } = useAuth();
 
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    category: "",
-    resourceType: "",
-    bookingMode: "REQUEST",
-    capacity: ""
-  });
+  const [form, setForm] = useState(
+    existing || {
+      title: "",
+      description: "",
+      category: "",
+      resourceType: "",
+      bookingMode: "REQUEST",
+      capacity: "",
+    }
+  );
 
   const [message, setMessage] = useState("");
 
   function handleChange(e) {
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+async function handleSubmit(e) {
+  e.preventDefault();
 
-    try {
-      await createResource(token, {
-        ...form,
-        capacity: form.capacity
-          ? Number(form.capacity)
-          : null
-      });
-
+  try {
+    if (existing) {
+      await updateResource(token, existing.id, form);
+      setMessage("Draft updated");
+    } else {
+      await createResource(token, form);
       setMessage("Resource created as DRAFT");
-      setForm({
-        title: "",
-        description: "",
-        category: "",
-        resourceType: "",
-        bookingMode: "REQUEST",
-        capacity: ""
-      });
-    } catch (err) {
-      setMessage(err.message);
     }
+  } catch (err) {
+    setMessage(err.message);
   }
+}
+
 
   return (
     <div>
