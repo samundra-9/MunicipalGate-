@@ -257,7 +257,56 @@ async createSlot(user, resourceId, startTime, endTime) {
 },
 async getSlots(resourceId) {
   return resourceRepository.findActiveSlots(resourceId);
+},
+
+async updateDraftResource(user, resourceId, data) {
+  const resource = await resourceRepository.findById(resourceId);
+
+  if (!resource) {
+    throw new HttpError(404, "Resource not found");
+  }
+
+  // ownership
+  if (resource.municipalityId !== user.municipalityId) {
+    throw new HttpError(403, "You do not own this resource");
+  }
+
+  // state gate
+  if (resource.status !== "DRAFT") {
+    throw new HttpError(400, "Only DRAFT resources can be edited");
+  }
+
+  // whitelist fields (do NOT allow status changes)
+  const {
+    title,
+    description,
+    category,
+    resourceType,
+    bookingMode,
+    capacity
+  } = data;
+
+  const updated = await resourceRepository.update(resourceId, {
+    title,
+    description,
+    category,
+    resourceType,
+    bookingMode,
+    capacity
+  });
+
+  await auditService.log({
+    actorId: user.id,
+    action: "UPDATE_RESOURCE_DRAFT",
+    entityType: "RESOURCE",
+    entityId: resourceId,
+    beforeData: { status: "DRAFT" },
+    afterData: updated
+  });
+
+  return updated;
 }
+
 
 };
 

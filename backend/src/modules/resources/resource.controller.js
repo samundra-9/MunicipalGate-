@@ -92,4 +92,17 @@ export async function listMyResources(req, res, next) {
     next(error);
   }
 };
+export async function updateResource(req, res, next) {
+  try {
+    const resourceId = Number(req.params.id);
+    const updated = await resourceService.updateDraftResource(
+      req.user,
+      resourceId,
+      req.body
+    );
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+}
 

@@ -109,5 +109,12 @@ async findActiveSlots(resourceId) {
     },
     orderBy: { startTime: "asc" }
   });
-}  
+} ,
+async update(id, data) {
+  return prisma.resource.update({
+    where: { id },
+    data
+  });
+}
+
 };

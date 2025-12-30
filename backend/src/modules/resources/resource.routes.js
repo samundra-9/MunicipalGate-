@@ -1,10 +1,16 @@
 import express from "express";
-import { createResource,submitResource,publishResource,getResourceSlots,listMyResources} from "./resource.controller.js";
+import {
+  createResource,
+  submitResource,
+  publishResource,
+  getResourceSlots,
+  listMyResources,
+  updateResource,
+} from "./resource.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { rbacMiddleware } from "../../middlewares/rbac.middleware.js";
 import { listPublicResources } from "./resource.controller.js";
 import { createSlot } from "./resource.controller.js";
-
 
 const router = express.Router();
 
@@ -19,14 +25,12 @@ router.get("/", listPublicResources);
 
 router.get("/:id/slots", getResourceSlots);
 
-
 router.post(
   "/:id/slots",
   authMiddleware,
   rbacMiddleware("MUNICIPAL_ADMIN"),
   createSlot
 );
-
 
 router.post(
   "/",
@@ -49,6 +53,10 @@ router.post(
   publishResource
 );
 
-
-
+router.put(
+  "/:id",
+  authMiddleware,
+  rbacMiddleware("MUNICIPAL_ADMIN"),
+  updateResource
+);
 export default router;
