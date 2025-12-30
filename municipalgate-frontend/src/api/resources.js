@@ -68,5 +68,32 @@ export async function updateResource(token, resourceId, payload) {
   if (!res.ok) throw new Error(data.message);
   return data;
 }
+export async function addResourceMedia(token, resourceId, payload) {
+  const res = await fetch(
+    `http://localhost:5000/api/resources/${resourceId}/media`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    }
+  );
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data;
+}
+
+export async function deleteResourceMedia(token, mediaId) {
+  await fetch(
+    `http://localhost:5000/api/resources/media/${mediaId}`,
+    {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+}
 
 
