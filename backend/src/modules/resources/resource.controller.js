@@ -104,5 +104,34 @@ export async function updateResource(req, res, next) {
   } catch (err) {
     next(err);
   }
+};
+
+export async function addResourceMedia(req, res, next) {
+  try {
+    const resourceId = Number(req.params.id);
+
+    const media = await resourceService.addMedia(
+      req.user,
+      resourceId,
+      req.body
+    );
+
+    res.status(201).json(media);
+  } catch (err) {
+    next(err);
+  }
 }
+
+export async function removeResourceMedia(req, res, next) {
+  try {
+    await resourceService.removeMedia(
+      req.user,
+      Number(req.params.mediaId)
+    );
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+}
+
 

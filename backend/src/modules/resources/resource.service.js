@@ -305,7 +305,55 @@ async updateDraftResource(user, resourceId, data) {
   });
 
   return updated;
+},
+
+async addMedia(user, resourceId, { type, url }) {
+  if (!type || !url) {
+    throw new HttpError(400, "type and url are required");
+  }
+
+  const resource = await resourceRepository.findById(resourceId);
+
+  if (!resource) {
+    throw new HttpError(404, "Resource not found");
+  }
+
+  if (resource.municipalityId !== user.municipalityId) {
+    throw new HttpError(403, "Not your resource");
+  }
+
+  if (resource.status !== "DRAFT") {
+    throw new HttpError(400, "Only DRAFT resources can be edited");
+  }
+
+  return resourceRepository.addMedia({
+    resourceId,
+    type,
+    url,
+    uploadedById: user.id
+  });
+},
+
+async removeMedia(user, mediaId) {
+  const media = await resourceRepository.findMediaById(mediaId);
+
+  if (!media) {
+    throw new HttpError(404, "Media not found");
+  }
+
+  const resource = await resourceRepository.findById(media.resourceId);
+
+  if (resource.municipalityId !== user.municipalityId) {
+    throw new HttpError(403, "Not your resource");
+  }
+
+  if (resource.status !== "DRAFT") {
+    throw new HttpError(400, "Cannot modify non-draft resource");
+  }
+
+  await resourceRepository.removeMedia(mediaId);
 }
+
 
 
 };

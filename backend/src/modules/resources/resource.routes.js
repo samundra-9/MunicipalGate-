@@ -6,6 +6,8 @@ import {
   getResourceSlots,
   listMyResources,
   updateResource,
+  removeResourceMedia,
+  addResourceMedia
 } from "./resource.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { rbacMiddleware } from "../../middlewares/rbac.middleware.js";
@@ -58,5 +60,19 @@ router.put(
   authMiddleware,
   rbacMiddleware("MUNICIPAL_ADMIN"),
   updateResource
+);
+
+router.post(
+  "/:id/media",
+  authMiddleware,
+  rbacMiddleware("MUNICIPAL_ADMIN"),
+  addResourceMedia
+);
+
+router.delete(
+  "/media/:mediaId",
+  authMiddleware,
+  rbacMiddleware("MUNICIPAL_ADMIN"),
+  removeResourceMedia
 );
 export default router;

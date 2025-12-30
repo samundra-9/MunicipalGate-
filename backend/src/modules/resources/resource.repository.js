@@ -115,6 +115,33 @@ async update(id, data) {
     where: { id },
     data
   });
+},
+async addMedia(data) {
+  return prisma.resourceMedia.create({ data });
+},
+
+async findMediaById(id) {
+  return prisma.resourceMedia.findUnique({ where: { id } });
+},
+
+async removeMedia(id) {
+  return prisma.resourceMedia.delete({ where: { id } });
+},
+
+async findPublicResources() {
+  return prisma.resource.findMany({
+    where: { status: "PUBLISHED" },
+    include: {
+      media: true,
+      municipality: {
+        include: {
+          district: { include: { province: true } }
+        }
+      }
+    }
+  });
 }
+
+
 
 };
