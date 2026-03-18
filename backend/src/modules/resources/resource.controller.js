@@ -135,3 +135,14 @@ export async function removeResourceMedia(req, res, next) {
 }
 
 
+export async function getResourceById(req, res, next) {
+  try {
+    const resource = await resourceService.findByIdWithDetails(
+      Number(req.params.id),
+      req.user // optional: include user-specific data if authenticated
+    );
+    res.json(resource);
+  } catch (error) {
+    next(error);
+  }
+}

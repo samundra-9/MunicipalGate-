@@ -352,9 +352,36 @@ async removeMedia(user, mediaId) {
   }
 
   await resourceRepository.removeMedia(mediaId);
+},
+
+async findByIdWithDetails(resourceId, user) {
+  const resource = await resourceRepository.findById(resourceId);
+  if (!resource) throw new HttpError(404, "Resource not found");
+  
+  // Only return PUBLISHED resources to public, or owner's resources
+  if (resource.status !== "PUBLISHED" && 
+      (!user || user.municipalityId !== resource.municipalityId)) {
+    throw new HttpError(403, "Resource not accessible");
+  }
+  
+  // Fetch related data
+  const [media, availability, rules, slots] = await Promise.all([
+    resourceRepository.findMedia(resourceId),
+    resourceRepository.findAvailability(resourceId),
+    resourceRepository.findRules(resourceId),
+    resource.bookingMode === "SLOT" 
+      ? resourceRepository.findActiveSlots(resourceId) 
+      : Promise.resolve([])
+  ]);
+  
+  return {
+    ...resource,
+    media,
+    availability,
+    rules,
+    slots: resource.bookingMode === "SLOT" ? slots : undefined
+  };
 }
-
-
 
 };
 
