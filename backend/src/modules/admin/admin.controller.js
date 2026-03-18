@@ -13,8 +13,8 @@ export async function getPendingBookings(req, res, next) {
 
 export async function getPendingResources(req, res, next) {
   try {
-    const resources =
-      await adminService.getPendingResources();
+    // Delegates to resource service - proper separation of concerns
+    const resources = await resourceService.findPendingApproval();
     res.json(resources);
   } catch (error) {
     next(error);

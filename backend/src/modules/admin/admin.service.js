@@ -75,6 +75,18 @@ export const adminService = {
       createdAt: "asc"
     }
   });
+},
+async findPendingApproval() {
+  return prisma.resource.findMany({
+    where: { status: "PENDING_APPROVAL" },
+    include: {
+      municipality: {
+        include: { district: { include: { province: true } } }
+      },
+      createdBy: { select: { name: true, email: true } }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
 }
 
 };
