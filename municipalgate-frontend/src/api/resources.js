@@ -1,3 +1,4 @@
+const API_BASE = import.meta.env?.VITE_API_URL || "http://localhost:5000/api";
 export async function fetchPublicResources() {
   const res = await fetch("http://localhost:5000/api/resources");
   const data = await res.json();
@@ -96,4 +97,22 @@ export async function deleteResourceMedia(token, mediaId) {
   );
 }
 
+export async function fetchResourceById(id) {
+  const res = await fetch(`${API_BASE}/resources/${id}`);
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to fetch resource");
+  }
+  return res.json();
+}
+
+export async function fetchSlots(resourceId) {
+  const res = await fetch(`${API_BASE}/resources/${resourceId}/slots`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to fetch slots");
+  }
+  return res.json();
+}
 
