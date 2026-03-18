@@ -22,6 +22,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<PublicResources />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           <Route path="/resources/:id" element={<ResourceDetail />} />
 
