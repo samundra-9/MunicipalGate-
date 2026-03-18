@@ -1,5 +1,9 @@
+
+const API_URL = "http://localhost:5001/api";
+
+
 export async function createBooking(token, payload) {
-  const res = await fetch("http://localhost:5000/api/bookings", {
+  const res = await fetch(`${API_URL}/bookings`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,7 +22,7 @@ export async function createBooking(token, payload) {
 };
 export async function fetchMyBookings(token) {
   const res = await fetch(
-    "http://localhost:5000/api/bookings/my",
+    `${API_URL}/bookings/my`,
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -33,7 +37,7 @@ export async function fetchMyBookings(token) {
 
 export async function requestSlot(token, slotId) {
   const res = await fetch(
-    "http://localhost:5000/api/bookings/slot",
+    `${API_URL}/bookings/slot`,
     {
       method: "POST",
       headers: {

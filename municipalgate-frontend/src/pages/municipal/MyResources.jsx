@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
 import { submitResource } from "../../api/resources";
 
+// const { Link } = require("react-router-dom");
+const API_URL = "http://localhost:5001/api";
 export default function MyResources() {
   const { token } = useAuth();
   const [resources, setResources] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/resources/my", {
+    fetch(`${API_URL}/resources/my`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

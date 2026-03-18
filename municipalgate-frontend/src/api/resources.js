@@ -1,6 +1,6 @@
-const API_BASE = import.meta.env?.VITE_API_URL || "http://localhost:5000/api";
+const API_URL  = import.meta.env?.VITE_API_URL || "http://localhost:5001/api";
 export async function fetchPublicResources() {
-  const res = await fetch("http://localhost:5000/api/resources");
+  const res = await fetch(`${API_URL}/resources`);
   const data = await res.json();
 
   if (!res.ok) {
@@ -10,19 +10,10 @@ export async function fetchPublicResources() {
   return data;
 };
 
-export async function fetchSlots(resourceId) {
-  const res = await fetch(
-    `http://localhost:5000/api/resources/${resourceId}/slots`
-  );
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message);
-  return data;
-};
 
 export async function createResource(token, payload) {
   const res = await fetch(
-    "http://localhost:5000/api/resources",
+    `${API_URL}/resources`,
     {
       method: "POST",
       headers: {
@@ -39,7 +30,7 @@ export async function createResource(token, payload) {
 };
 export async function submitResource(token, resourceId) {
   const res = await fetch(
-    `http://localhost:5000/api/resources/${resourceId}/submit`,
+    `${API_URL}/resources/${resourceId}/submit`,
     {
       method: "POST",
       headers: {
@@ -54,7 +45,7 @@ export async function submitResource(token, resourceId) {
 }
 export async function updateResource(token, resourceId, payload) {
   const res = await fetch(
-    `http://localhost:5000/api/resources/${resourceId}`,
+    `${API_URL}/resources/${resourceId}`,
     {
       method: "PUT",
       headers: {
@@ -71,7 +62,7 @@ export async function updateResource(token, resourceId, payload) {
 }
 export async function addResourceMedia(token, resourceId, payload) {
   const res = await fetch(
-    `http://localhost:5000/api/resources/${resourceId}/media`,
+    `${API_URL}/resources/${resourceId}/media`,
     {
       method: "POST",
       headers: {
@@ -89,7 +80,7 @@ export async function addResourceMedia(token, resourceId, payload) {
 
 export async function deleteResourceMedia(token, mediaId) {
   await fetch(
-    `http://localhost:5000/api/resources/media/${mediaId}`,
+    `${API_URL}/resources/media/${mediaId}`,
     {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` }
@@ -98,7 +89,7 @@ export async function deleteResourceMedia(token, mediaId) {
 }
 
 export async function fetchResourceById(id) {
-  const res = await fetch(`${API_BASE}/resources/${id}`);
+  const res = await fetch(`${API_URL}/resources/${id}`);
   if (res.status === 404) return null;
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -108,7 +99,7 @@ export async function fetchResourceById(id) {
 }
 
 export async function fetchSlots(resourceId) {
-  const res = await fetch(`${API_BASE}/resources/${resourceId}/slots`);
+  const res = await fetch(`${API_URL}/resources/${resourceId}/slots`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || "Failed to fetch slots");

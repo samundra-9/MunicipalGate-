@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import ResourceForm from "./ResourceForm";
-
+const API_URL = "http://localhost:5001/api";
 export default function EditResource() {
   const { id } = useParams();
   const { token } = useAuth();
@@ -10,7 +10,7 @@ export default function EditResource() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/resources", {
+    fetch(`${API_URL}/resources`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

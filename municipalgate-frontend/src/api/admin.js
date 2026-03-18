@@ -1,6 +1,7 @@
+const API_URL = "http://localhost:5001/api";
 export async function fetchPendingBookings(token) {
   const res = await fetch(
-    "http://localhost:5000/api/admin/bookings/pending",
+    `${API_URL}/admin/bookings/pending`,
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -15,7 +16,7 @@ export async function fetchPendingBookings(token) {
 
 export async function approveBooking(token, bookingId) {
   const res = await fetch(
-    `http://localhost:5000/api/bookings/${bookingId}/approve`,
+    `${API_URL}/bookings/${bookingId}/approve`,
     {
       method: "POST",
       headers: {
@@ -31,7 +32,7 @@ export async function approveBooking(token, bookingId) {
 
 export async function rejectBooking(token, bookingId, reason) {
   const res = await fetch(
-    `http://localhost:5000/api/bookings/${bookingId}/reject`,
+    `${API_URL}/bookings/${bookingId}/reject`,
     {
       method: "POST",
       headers: {
@@ -49,7 +50,7 @@ export async function rejectBooking(token, bookingId, reason) {
 
 export async function fetchPendingResources(token) {
   const res = await fetch(
-    "http://localhost:5000/api/admin/resources/pending",
+    `${API_URL}/admin/resources/pending`,
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -64,7 +65,7 @@ export async function fetchPendingResources(token) {
 
 export async function publishResource(token, resourceId) {
   const res = await fetch(
-    `http://localhost:5000/api/resources/${resourceId}/publish`,
+    `${API_URL}/resources/${resourceId}/publish`,
     {
       method: "POST",
       headers: {
