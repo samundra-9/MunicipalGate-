@@ -143,6 +143,7 @@ export async function getResourceById(req, res, next) {
     );
     res.json(resource);
   } catch (error) {
+    if (error.status === 404) return res.status(404).json({ message: "Resource not found" });
     next(error);
   }
 }
