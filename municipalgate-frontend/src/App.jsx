@@ -11,6 +11,8 @@ import ResourceDetail from "./pages/ResourceDetail";
 import ResourceForm from "./pages/municipal/ResourceForm";
 import MyResources from "./pages/municipal/MyResources";
 import EditResourceWrapper from "./pages/municipal/EditResource";
+import ActivityLogs from "./pages/admin/ActivityLogs";
+
 
 export default function App() {
   return (
@@ -71,6 +73,14 @@ export default function App() {
             element={
               <ProtectedRoute role="MUNICIPAL_ADMIN">
                 <EditResourceWrapper />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/activity"
+            element={
+              <ProtectedRoute>
+                <ActivityLogs />
               </ProtectedRoute>
             }
           />

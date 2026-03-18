@@ -6,7 +6,7 @@ import resourceRoutes from "./modules/resources/resource.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import bookingRoutes from "./modules/bookings/booking.routes.js";
 import adminRoutes from "./modules/admin/admin.routes.js";
-
+import auditRoutes from "./modules/audit/audit.routes.js"
 
 // MIDDLEWARES
 import { errorMiddleware } from "./middlewares/error.middleware.js";
@@ -23,6 +23,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/resources", resourceRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/audit", auditRoutes);
 
 
 // -------- HEALTH CHECK --------

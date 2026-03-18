@@ -40,6 +40,13 @@ export default function Navbar() {
         </>
       )}
 
+      {(user?.role === "CENTRAL_ADMIN" || user?.role === "MUNICIPAL_ADMIN") && (
+        <>
+          {" | "}
+          <Link to="/admin/activity">Activity Logs</Link>
+        </>
+      )}
+
       {user && (
         <>
           {" | "}
